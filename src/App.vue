@@ -1,37 +1,16 @@
 <script setup>
-  import Stat from './componets/Stat.vue';
-  import CitySelect from './componets/CitySelect.vue';
-  import Error from './componets/Error.vue';
-  import {ref, reactive, computed} from 'vue';
-  import DayCard from './componets/DayCard.vue'
+
+import {ref, reactive, computed} from 'vue';
+import PanelRight from './componets/PanelRight.vue';
 
   // let savedCity = ref('Moscow');
   
   const API_ENDPOINT ="https://api.weatherapi.com/v1";
 
 
-
-  let data = ref();
+  let data = ref(null);
   let error = ref();
   let activeIndex = ref(0);
-
-  const dataModified = computed(() => {
-    if(!data.value) return
-    return [
-      {
-        label: 'Влажность',
-        stat:  data.value.current.humidity + " %"
-      },
-      {
-        label: 'Облачность',
-        stat:  data.value.current.cloud + " %"
-      },
-       {
-        label: 'Ветер',
-        stat:  data.value.current.wind_kph + " км/ч"
-      },
-    ] 
-  })
 
 
   async function getCity(city){
@@ -63,27 +42,9 @@
 
     </div>
     <div class="right">
-      <Error :error="errorDisplay"/>
-    
-      <div v-if="data" class="stat-list">
-        <div>
-          <Stat v-for="item in dataModified" v-bind="item" :key="item.label"></Stat>
-        </div>
-    
-        <div class="day-card-list">
-          <DayCard v-for="(item, i) in data.forecast.forecastday"
-          :key="item.date"
-          :weather-img="item.day.condition.icon"
-           :temp="item.day.avgtemp_c"
-           :date="new Date(item.date)"
-           :is-active="activeIndex == i"
-           @click="() => activeIndex = i"/>
-        </div>
-    
+     <PanelRight :data="data" :error="error" :active-index="activeIndex" @select-index="(i) =>  activeIndex=i" @select-city="getCity"/>
       </div>
-    
-    <CitySelect @select-city="getCity"/>
-    </div>
+
   </main>
 </template>
 
@@ -106,16 +67,5 @@
       padding: 60px 50px;
       border-radius: 0 25px 25px 0;
     }
-    .day-card-list{
-      display: flex;
-      column-gap: 10px;
-    }
-
-    .stat-list{
-      display: flex;
-      flex-direction: column;
-      gap: 80px;
-      margin-bottom: 70px;
-    }
-
+   
 </style>
